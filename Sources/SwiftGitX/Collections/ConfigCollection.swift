@@ -3,10 +3,16 @@ import libgit2
 // ? Should we use actor?
 /// A collection of configurations and their operations.
 public struct ConfigCollection {
-    private let repositoryPointer: OpaquePointer
+    private let repositoryPointer: OpaquePointer?
 
+    /// Init for repository configurations.
     init(repositoryPointer: OpaquePointer) {
         self.repositoryPointer = repositoryPointer
+    }
+
+    /// Init for global configurations.
+    init() {
+        repositoryPointer = nil
     }
 
     /// The default branch name of the repository
@@ -18,7 +24,11 @@ public struct ConfigCollection {
         var configPointer: OpaquePointer?
         defer { git_config_free(configPointer) }
 
-        git_repository_config(&configPointer, repositoryPointer)
+        if let repositoryPointer {
+            git_repository_config(&configPointer, repositoryPointer)
+        } else {
+            git_config_open_default(&configPointer)
+        }
 
         var branchNameBuffer = git_buf()
         defer { git_buf_free(&branchNameBuffer) }
@@ -39,7 +49,11 @@ public struct ConfigCollection {
         var configPointer: OpaquePointer?
         defer { git_config_free(configPointer) }
 
-        git_repository_config(&configPointer, repositoryPointer)
+        if let repositoryPointer {
+            git_repository_config(&configPointer, repositoryPointer)
+        } else {
+            git_config_open_default(&configPointer)
+        }
 
         guard let configPointer else {
             // TODO: Handle error
@@ -61,7 +75,11 @@ public struct ConfigCollection {
         var configPointer: OpaquePointer?
         defer { git_config_free(configPointer) }
 
-        git_repository_config(&configPointer, repositoryPointer)
+        if let repositoryPointer {
+            git_repository_config(&configPointer, repositoryPointer)
+        } else {
+            git_config_open_default(&configPointer)
+        }
 
         guard let configPointer else {
             // TODO: Handle error

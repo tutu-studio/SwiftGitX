@@ -331,9 +331,14 @@ public extension Repository {
         BranchCollection(repositoryPointer: pointer)
     }
 
-    /// Collection of config operations.
+    /// Collection of repository configuration operations.
     var config: ConfigCollection {
         ConfigCollection(repositoryPointer: pointer)
+    }
+
+    /// Collection of global configuration operations.
+    static var config: ConfigCollection {
+        ConfigCollection()
     }
 
     /// Collection of index operations.

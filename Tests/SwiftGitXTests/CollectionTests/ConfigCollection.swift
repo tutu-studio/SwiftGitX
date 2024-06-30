@@ -3,11 +3,12 @@ import XCTest
 
 final class ConfigCollectionTests: SwiftGitXTestCase {
     func testConfigDefaultBranchName() {
+        Repository.config.set("main", forKey: "init.defaultBranch")
+
         let repository = Repository.mock(named: "test-config-default-branch-name", in: Self.directory)
 
-        repository.config.set("main", forKey: "init.defaultBranch")
-
         XCTAssertEqual(repository.config.defaultBranchName, "main")
+        XCTAssertEqual(Repository.config.defaultBranchName, "main")
     }
 
     func testConfigSet() {
@@ -16,6 +17,7 @@ final class ConfigCollectionTests: SwiftGitXTestCase {
         repository.config.set("develop", forKey: "init.defaultBranch")
 
         XCTAssertEqual(repository.config.defaultBranchName, "develop")
+        XCTAssertNotEqual(Repository.config.defaultBranchName, "develop")
     }
 
     func testConfigString() {
