@@ -46,28 +46,23 @@ final class RemoteCollectionTests: SwiftGitXTestCase {
         try remoteRepository.mockCommit()
 
         // Create branches in the repository
-        let branchNames = [
-            "feature/1",
-            "feature/2",
-            "feature/3",
-            "feature/4",
-            "feature/5",
-            "feature/6",
-            "feature/7"
-        ]
-        let branches = try branchNames.map { name in
-            try remoteRepository.branch.create(named: name, from: remoteRepository.branch.current)
-        }
+        try ["feature/1", "feature/2", "feature/3", "feature/4", "feature/5", "feature/6", "feature/7"]
+            .forEach { name in
+                try remoteRepository.branch.create(named: name, from: remoteRepository.branch.current)
+            }
+        let branches = Array(remoteRepository.branch.local)
+
+        XCTAssertEqual(branches.count, 8)
 
         // Clone remote repository to local repository
         let localDirectory = Repository.mockDirectory(named: "test-remote-branches--local", in: Self.directory)
         let localRepository = try await Repository.clone(from: remoteRepository.workingDirectory, to: localDirectory)
 
         // Get the remote from the repository excluding the main branch
-        let remoteBranches = Array(localRepository.branch.remote.filter { $0.name != "origin/main" })
+        let remoteBranches = Array(localRepository.branch.remote)
 
         // Check if the branches are the same
-        XCTAssertEqual(remoteBranches.count, 7)
+        XCTAssertEqual(remoteBranches.count, 8)
 
         for (remoteBranch, branch) in zip(remoteBranches, branches) {
             XCTAssertEqual(remoteBranch.name, "origin/" + branch.name)

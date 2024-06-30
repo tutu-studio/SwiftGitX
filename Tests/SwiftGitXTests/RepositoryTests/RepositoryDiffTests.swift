@@ -260,11 +260,8 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
     }
 
     func testDiffEquality() throws {
-        // Create a temporary directory
-        let directory = Repository.mockDirectory(named: "test-diff-equality", in: Self.directory)
-
         // Create a repository at the directory
-        let repository = try Repository.create(at: directory)
+        let repository = Repository.mock(named: "test-diff-equality", in: Self.directory)
 
         // Create mock commits
         let (initialCommit, secondCommit) = try mockCommits(repository: repository)
@@ -273,12 +270,12 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         let diff = try repository.diff(from: initialCommit, to: secondCommit)
 
         // Open second repository at the same directory
-        let sameRepository = try Repository.open(at: directory)
+        let sameRepository = try Repository.open(at: repository.workingDirectory)
 
         // Get the diff between the two commits
         let sameDiff = try sameRepository.diff(from: initialCommit, to: secondCommit)
 
-        // Check the diff properties
+        // Check the diff properties are equal between the two repositories
         XCTAssertEqual(sameDiff, diff)
     }
 }

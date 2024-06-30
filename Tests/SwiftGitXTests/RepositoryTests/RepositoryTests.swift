@@ -24,6 +24,9 @@ extension Repository {
             repository.config.set("İbrahim Çetin", forKey: "user.name")
             repository.config.set("mail@ibrahimcetin.dev", forKey: "user.email")
 
+            // Set the default branch to `main`
+            repository.config.set("main", forKey: "init.defaultBranch")
+
             return repository
         } catch {
             fatalError("Failed to create a mock repository: \(error)")
@@ -99,6 +102,10 @@ final class RepositoryTests: SwiftGitXTestCase {
 
         // This should create a new repository at the empty directory
         let repositoryCreated = try Repository(at: directory)
+
+        // Update the configuration to use the current user's name and email
+        repositoryCreated.config.set("İbrahim Çetin", forKey: "user.name")
+        repositoryCreated.config.set("mail@ibrahimcetin.dev", forKey: "user.email")
 
         // Create a new commit
         let commit = try repositoryCreated.mockCommit()

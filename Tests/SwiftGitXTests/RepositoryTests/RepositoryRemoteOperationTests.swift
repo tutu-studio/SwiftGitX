@@ -12,6 +12,10 @@ final class RepositoryRemoteOperationTests: SwiftGitXTestCase {
         let localDirectory = Repository.mockDirectory(named: "test-push--local", in: Self.directory)
         let localRepository = try await Repository.clone(from: remoteDirectory, to: localDirectory)
 
+        // Update the configuration to use the current user's name and email
+        localRepository.config.set("İbrahim Çetin", forKey: "user.name")
+        localRepository.config.set("mail@ibrahimcetin.dev", forKey: "user.email")
+
         // Create a new commit in the local repository
         try localRepository.mockCommit(message: "Pushed commit", file: localRepository.mockFile(named: "PushedFile.md"))
 

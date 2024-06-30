@@ -5,6 +5,8 @@ final class ConfigCollectionTests: SwiftGitXTestCase {
     func testConfigDefaultBranchName() {
         let repository = Repository.mock(named: "test-config-default-branch-name", in: Self.directory)
 
+        repository.config.set("main", forKey: "init.defaultBranch")
+
         XCTAssertEqual(repository.config.defaultBranchName, "main")
     }
 
