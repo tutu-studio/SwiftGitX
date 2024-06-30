@@ -18,7 +18,13 @@ extension Repository {
             let directory = mockDirectory(named: name, in: parentDirectoryName)
 
             // Create a new repository at the temporary directory
-            return try Repository.create(at: directory)
+            let repository = try Repository.create(at: directory)
+
+            // Update the configuration to use the current user's name and email
+            repository.config.set("İbrahim Çetin", forKey: "user.name")
+            repository.config.set("mail@ibrahimcetin.dev", forKey: "user.email")
+
+            return repository
         } catch {
             fatalError("Failed to create a mock repository: \(error)")
         }
