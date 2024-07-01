@@ -31,7 +31,8 @@
 ### Collections
 
 - ``branch``
-- ``config``
+- ``config-swift.property``
+- ``config-swift.type.property``
 - ``reference``
 - ``remote``
 - ``stash``
