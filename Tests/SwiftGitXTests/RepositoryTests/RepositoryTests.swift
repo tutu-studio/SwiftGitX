@@ -17,17 +17,8 @@ extension Repository {
         do {
             let directory = mockDirectory(named: name, in: parentDirectoryName)
 
-            // Set the default branch to `main` before creating the repository
-            Repository.config.set("main", forKey: "init.defaultBranch")
-
             // Create a new repository at the temporary directory
-            let repository = try Repository.create(at: directory)
-
-            // Update the configuration to use the current user's name and email
-            repository.config.set("İbrahim Çetin", forKey: "user.name")
-            repository.config.set("mail@ibrahimcetin.dev", forKey: "user.email")
-
-            return repository
+            return try Repository.create(at: directory)
         } catch {
             fatalError("Failed to create a mock repository: \(error)")
         }
@@ -102,10 +93,6 @@ final class RepositoryTests: SwiftGitXTestCase {
 
         // This should create a new repository at the empty directory
         let repositoryCreated = try Repository(at: directory)
-
-        // Update the configuration to use the current user's name and email
-        repositoryCreated.config.set("İbrahim Çetin", forKey: "user.name")
-        repositoryCreated.config.set("mail@ibrahimcetin.dev", forKey: "user.email")
 
         // Create a new commit
         let commit = try repositoryCreated.mockCommit()
