@@ -14,13 +14,28 @@ jobs:
     runs-on: macos-latest
 
     steps:
+    # Checkout the code
     - uses: actions/checkout@v4
+    # Cache the Swift Package Manager build directory
+    - uses: actions/cache@v3
+      with:
+        path: .build
+        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+    # Resolve dependencies
+    - name: Resolve dependencies
+      run: swift package resolve
+    # Clean up the build directory
+    - name: Clean up
+      run: swift package clean
+    # Build the project
     - name: Build SwiftGitX
       run: swift build -v
+    # Update git configurations
     - name: Update git configurations
       run: >
           git config --global init.defaultBranch main &&
           git config --global user.name "İbrahim Çetin" &&
           git config --global user.email "mail@ibrahimcetin.dev"
+    # Run tests
     - name: Run tests
       run: swift test -v
