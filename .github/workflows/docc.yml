@@ -37,10 +37,15 @@ jobs:
                 --output-path .docs
 
   deploy:
+    # This job is triggered by the completion of the build job
+    needs: build
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    # This job runs on the ubuntu-latest runner
     runs-on: ubuntu-latest
+
     steps:
       - name: Setup Pages
         uses: actions/configure-pages@v5
