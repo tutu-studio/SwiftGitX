@@ -29,12 +29,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Generate documentation
-        run: swift package --allow-writing-to-directory .docs \
-                generate-documentation --target SwiftGitX \
-                --disable-indexing \
-                --transform-for-static-hosting \
-                --hosting-base-path SwiftGitX \
-                --output-path .docs
+        run: >
+            swift package --allow-writing-to-directory .docs
+            generate-documentation --target SwiftGitX
+            --disable-indexing
+            --transform-for-static-hosting
+            --hosting-base-path SwiftGitX
+            --output-path .docs
 
   deploy:
     # This job is triggered by the completion of the build job
