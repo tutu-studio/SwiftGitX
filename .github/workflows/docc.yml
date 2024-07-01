@@ -25,7 +25,13 @@ jobs:
   build:
     runs-on: macos-latest
 
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # This job runs on the ubuntu-latest runner
+
     steps:
+      # Generates the documentation using Swift-DocC
       - name: Checkout
         uses: actions/checkout@v4
       - name: Generate documentation
@@ -37,17 +43,7 @@ jobs:
             --hosting-base-path SwiftGitX
             --output-path .docs
 
-  deploy:
-    # This job is triggered by the completion of the build job
-    needs: build
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    # This job runs on the ubuntu-latest runner
-    runs-on: ubuntu-latest
-
-    steps:
+      # Deploy the generated documentation to GitHub Pages
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
