@@ -1,5 +1,10 @@
 import libgit2
 
+/// A sequence of commits.
+///
+/// This sequence is an async sequence that iterates over the commits in a repository.
+///
+/// - Warning: The sequence's task should be cancelled before ``Repository`` is deinitialized.
 public struct CommitSequence: AsyncSequence {
     public typealias Element = Commit
 
@@ -51,6 +56,9 @@ public class CommitIterator: AsyncIteratorProtocol {
     }
 
     public func next() -> Commit? {
+        // Task should not be cancelled
+        if Task.isCancelled { return nil }
+
         // Get the next commit
         var oid = git_oid()
         let status = git_revwalk_next(&oid, walkerPointer)
