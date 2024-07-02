@@ -735,6 +735,7 @@ public extension Repository {
         try setHEAD(to: commit)
     }
 
+    // TODO: Implement checkout options as parameter
     private func checkout(commitID: OID) throws {
         // Lookup the commit
         let commitPointer = try ObjectFactory.lookupObjectPointer(
@@ -744,10 +745,13 @@ public extension Repository {
         )
         defer { git_object_free(commitPointer) }
 
-        // TODO: Implement checkout options
+        var options = git_checkout_options()
+        git_checkout_init_options(&options, UInt32(GIT_CHECKOUT_OPTIONS_VERSION))
+
+        options.checkout_strategy = GIT_CHECKOUT_SAFE.rawValue
 
         // Perform the checkout operation
-        let checkoutStatus = git_checkout_tree(pointer, commitPointer, nil)
+        let checkoutStatus = git_checkout_tree(pointer, commitPointer, &options)
 
         guard checkoutStatus == GIT_OK.rawValue else {
             let errorMessage = String(cString: git_error_last().pointee.message)
