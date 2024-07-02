@@ -8,6 +8,8 @@
 import Foundation
 import libgit2
 
+// swiftlint:disable file_length
+
 /// An enumeration that represents the possible errors that can occur in a repository.
 public enum RepositoryError: Error {
     case failedToCreate(String)
@@ -781,7 +783,11 @@ public extension Repository {
                 guard let target = remoteBranch.target as? Commit
                 else { continue }
 
-                return try self.branch.create(named: remoteBranch.name, target: target)
+                // Remove the remote name from the branch name
+                let newBranchName = remoteBranch.name.replacingOccurrences(of: "\(remote.name)/", with: "")
+
+                // Create a new branch from the remote branch
+                return try self.branch.create(named: newBranchName, target: target)
             }
         }
 

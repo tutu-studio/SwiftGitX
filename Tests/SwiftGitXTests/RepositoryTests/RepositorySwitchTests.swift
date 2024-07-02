@@ -36,7 +36,7 @@ final class RepositorySwitchTests: SwiftGitXTestCase {
         let head = try repository.HEAD
 
         // Check the HEAD reference
-        XCTAssertEqual(head.name, remoteBranch.name)
+        XCTAssertEqual(head.name, remoteBranch.name.replacingOccurrences(of: "origin/", with: ""))
         XCTAssertEqual(head.target as? Commit, remoteBranch.target as? Commit)
     }
 
