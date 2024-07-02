@@ -35,7 +35,7 @@ dependencies: [
 
 ## Documentation
 
-Check out online documentation [here](https://ibrahimcetin.github.io/SwiftGitX/documentation/swiftgitx/). With [Swift-Docc](https://www.swift.org/documentation/docc/), you can access everything seamlessly in Xcode.
+Check out online documentation [here](https://ibrahimcetin.github.io/SwiftGitX/documentation/swiftgitx/). Thanks to [Swift-Docc](https://www.swift.org/documentation/docc/), you can access everything seamlessly in Xcode.
 
 ## Building and Testing
 SwiftGitX is easy to build and test. It requires only Swift, no additional system dependencies.
