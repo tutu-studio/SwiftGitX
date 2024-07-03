@@ -7,6 +7,7 @@
 ### Diff
 
 - ``Diff``
+- ``Patch``
 - ``StatusEntry``
 
 ### Remote

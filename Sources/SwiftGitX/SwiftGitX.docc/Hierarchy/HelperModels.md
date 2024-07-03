@@ -7,6 +7,7 @@
 ### Options
 
 - ``CloneOptions``
+- ``DiffOption``
 - ``LogSortingOption``
 - ``ResetOption``
 - ``RestoreOption``
