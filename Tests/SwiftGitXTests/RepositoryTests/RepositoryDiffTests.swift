@@ -2,14 +2,141 @@ import SwiftGitX
 import XCTest
 
 final class RepositoryDiffTests: SwiftGitXTestCase {
+    /// This test creates a commit and a working tree change (there is no staged change).
+    func testDiffHEADToWorkingTree() throws {
+        // Create a mock repository at the temporary directory
+        let repository = Repository.mock(named: "test-diff-head-working-tree", in: Self.directory)
+
+        // Create a commit
+        let file = try repository.mockFile(named: "README.md", content: "The commit content!\n")
+        try repository.mockCommit(file: file)
+
+        // Update the file content
+        try Data("The working tree content!\n".utf8).write(to: file)
+
+        // Get the diff between HEAD and the working tree
+        let diff = try repository.diff()
+
+        // Check if the diff count is correct
+        XCTAssertEqual(diff.patches[0].hunks.count, 1)
+
+        let hunk = diff.patches[0].hunks[0]
+
+        // Check the hunk lines
+        XCTAssertEqual(hunk.lines.count, 2)
+        XCTAssertEqual(hunk.lines[0].type, .deletion)
+        XCTAssertEqual(hunk.lines[0].content, "The commit content!\n")
+
+        XCTAssertEqual(hunk.lines[1].type, .addition)
+        XCTAssertEqual(hunk.lines[1].content, "The working tree content!\n")
+    }
+
+    /// This func creates base state for `testDiffHEADToWorkingTree_Staged`, `testDiffHEADToIndex` and
+    /// `testDiffHEADToWorkingTreeWithIndex`. It creates a commit, a staged change and a working tree change.
+    func createBaseStateForDiffHEAD(_ repository: Repository) throws {
+        // Create a file
+        let file = try repository.mockFile(named: "README.md", content: "The commit content!\n")
+
+        // Create a commit
+        try repository.mockCommit(file: file)
+
+        // Update the file content and add the file
+        try Data("The index content!\n".utf8).write(to: file)
+        try repository.add(file: file)
+
+        // Update the file content
+        try Data("\nThe working tree content!\n".utf8).write(to: file)
+    }
+
+    /// This test creates a commit, a staged change and a working tree change.
+    /// This test should compare the staged change with the working tree change.
+    func testDiffHEADToWorkingTree_Staged() throws {
+        // Create a mock repository at the temporary directory
+        let repository = Repository.mock(named: "test-diff-head-working-tree_staged", in: Self.directory)
+
+        // Create a base state for the test
+        try createBaseStateForDiffHEAD(repository)
+
+        // Get the diff between HEAD and the working tree
+        let diff = try repository.diff()
+
+        // Check if the diff count is correct
+        XCTAssertEqual(diff.patches[0].hunks.count, 1)
+
+        let hunk = diff.patches[0].hunks[0]
+
+        // Check the hunk lines
+        XCTAssertEqual(hunk.lines.count, 3)
+        XCTAssertEqual(hunk.lines[0].type, .deletion)
+        XCTAssertEqual(hunk.lines[0].content, "The index content!\n")
+
+        XCTAssertEqual(hunk.lines[1].content, "\n")
+
+        XCTAssertEqual(hunk.lines[2].type, .addition)
+        XCTAssertEqual(hunk.lines[2].content, "The working tree content!\n")
+    }
+
+    func testDiffHEADToIndex() throws {
+        // Create a mock repository at the temporary directory
+        let repository = Repository.mock(named: "test-diff-head-index", in: Self.directory)
+
+        // Create a base state for the test
+        try createBaseStateForDiffHEAD(repository)
+
+        // Get the diff between HEAD and the index
+        let diff = try repository.diff(to: .index)
+
+        // Check if the diff count is correct
+        XCTAssertEqual(diff.patches[0].hunks.count, 1)
+
+        let hunk = diff.patches[0].hunks[0]
+
+        // Check the hunk lines
+        XCTAssertEqual(hunk.lines.count, 2)
+        XCTAssertEqual(hunk.lines[0].type, .deletion)
+        XCTAssertEqual(hunk.lines[0].content, "The commit content!\n")
+
+        XCTAssertEqual(hunk.lines[1].type, .addition)
+        XCTAssertEqual(hunk.lines[1].content, "The index content!\n")
+    }
+
+    // This method tests the created diff if the repository has a staged change and a working tree change.
+    // The staged change should be included in the diff.
+    func testDiffHEADToWorkingTreeWithIndex() throws {
+        // Create a mock repository at the temporary directory
+        let repository = Repository.mock(named: "test-diff-head-working-tree-index", in: Self.directory)
+
+        // Create a base state for the test
+        try createBaseStateForDiffHEAD(repository)
+
+        // Get the diff between HEAD and the working tree with index
+        let diff = try repository.diff(to: [.index, .workingTree])
+
+        // Check if the diff count is correct
+        XCTAssertEqual(diff.patches[0].hunks.count, 1)
+
+        let hunk = diff.patches[0].hunks[0]
+
+        // Check the hunk lines
+        XCTAssertEqual(hunk.lines.count, 3)
+        XCTAssertEqual(hunk.lines[0].type, .deletion)
+        XCTAssertEqual(hunk.lines[0].content, "The commit content!\n")
+
+        XCTAssertEqual(hunk.lines[1].content, "\n")
+
+        XCTAssertEqual(hunk.lines[2].type, .addition)
+        XCTAssertEqual(hunk.lines[2].content, "The working tree content!\n")
+    }
+
+    /// This method creates two commits in the repository and returns them.
     private func mockCommits(repository: Repository) throws -> (initialCommit: Commit, secondCommit: Commit) {
-        let file = try repository.mockFile(named: "README.md", content: "")
+        let file = try repository.mockFile(named: "README.md", content: "Hello, SwiftGitX!\n")
 
         // Commit the changes
         let initialCommit = try repository.mockCommit(message: "Initial commit", file: file)
 
         // Modify the file
-        try Data("Hello, World!".utf8).write(to: file)
+        try Data("Hello, World!\n".utf8).write(to: file)
 
         // Commit the changes
         let secondCommit = try repository.mockCommit(message: "Second commit", file: file)
@@ -43,7 +170,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
 
         // Check the blob content
         let newContent = try XCTUnwrap(String(data: newBlob.content, encoding: .utf8))
-        XCTAssertEqual(newContent, "Hello, World!")
+        XCTAssertEqual(newContent, "Hello, World!\n")
     }
 
     func testDiffBetweenTreeAndTree() throws {
@@ -72,7 +199,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
 
         // Check the blob content
         let newContent = try XCTUnwrap(String(data: newBlob.content, encoding: .utf8))
-        XCTAssertEqual(newContent, "Hello, World!")
+        XCTAssertEqual(newContent, "Hello, World!\n")
     }
 
     func testDiffBetweenTagAndTag() throws {
@@ -107,7 +234,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
 
         // Check the blob content
         let newContent = try XCTUnwrap(String(data: newBlob.content, encoding: .utf8))
-        XCTAssertEqual(newContent, "Hello, World!")
+        XCTAssertEqual(newContent, "Hello, World!\n")
     }
 
     func testDiffCommitParent() throws {
@@ -118,13 +245,13 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         _ = try mockCommits(repository: repository)
 
         // Remove old content and write new content than commit
-        try repository.mockCommit(
+        let headCommit = try repository.mockCommit(
             message: "Third commit",
             file: repository.mockFile(named: "README.md", content: "Merhaba, Dünya!")
         )
 
         // Get the diff between the latest commit and its parent
-        let diff = try repository.diff()
+        let diff = try repository.diff(commit: headCommit)
 
         // Check if the diff count is correct
         XCTAssertEqual(diff.changes.count, 1)
@@ -147,7 +274,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
 
         // Check the blob content and size
         XCTAssertEqual(newText, "Merhaba, Dünya!")
-        XCTAssertEqual(oldText, "Hello, World!")
+        XCTAssertEqual(oldText, "Hello, World!\n")
     }
 
     func testDiffCommitNoParent() throws {

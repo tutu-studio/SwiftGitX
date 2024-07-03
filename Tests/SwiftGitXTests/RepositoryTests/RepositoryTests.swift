@@ -69,7 +69,7 @@ extension Repository {
 
         FileManager.default.createFile(
             atPath: file.path,
-            contents: (content ?? "Welcome to SwiftGitX!").data(using: .utf8)
+            contents: (content ?? "Welcome to SwiftGitX!\n").data(using: .utf8)
         )
 
         return file

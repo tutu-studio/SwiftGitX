@@ -176,7 +176,7 @@ final class RepositoryOperationTests: SwiftGitXTestCase {
         // Check the status of the file and the content
         let stagedFileStatus = try repository.status(file: file)
         XCTAssertTrue(stagedFileStatus.isEmpty) // There should be no changes (all changes are restored)
-        XCTAssertEqual(try String(contentsOf: file), "Welcome to SwiftGitX!")
+        XCTAssertEqual(try String(contentsOf: file), "Welcome to SwiftGitX!\n")
 
         // Create a new file to delete (this should be deleted)
         let fileToDelete = try repository.mockFile(named: "DeleteMe.md", content: "Delete me from stage area!")
