@@ -46,12 +46,6 @@ public struct Diff: Equatable, Hashable {
             if let patchPointer, patchStatus == GIT_OK.rawValue {
                 let patch = Patch(pointer: patchPointer)
                 patches.append(patch)
-
-                // Write patch to buf
-                var buf = git_buf()
-                git_patch_to_buf(&buf, patchPointer)
-                let str = String(cString: buf.ptr)
-                print(str)
             }
         }
 
