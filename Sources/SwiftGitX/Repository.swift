@@ -965,18 +965,59 @@ public extension Repository {
         return try status(path: path)
     }
 
-    /// Get the diff between HEAD commit and its parent.
+    /// Creates a diff of current changes.
     ///
-    /// - Returns: The diff between the HEAD commit and its parent.
+    /// - Returns: The diff of the current changes.
     ///
-    /// - Throws: `RepositoryError.failedToGetDiff` if the diff operation fails.
-    func diff() throws -> Diff {
+    /// The `from` side is used as `old file` and the `to` side is used as `new file`.
+    ///
+    /// The default behavior is the same as `git diff`.
+    /// If there are staged changes of the file, it create diff from index to working tree.
+    /// If there are no staged changes, it create diff from HEAD to working tree.
+    ///
+    /// If you want to create diff from HEAD to index, you can use `diff(to: .index)`.
+    /// This is the same as `git diff --cached`. ``DiffOption/index`` option only gets
+    /// differences between HEAD and index.
+    ///
+    /// The behavior of `git diff HEAD` can be achieved by using `diff(to: [.workingTree, .staged])`.
+    /// With this options, it creates diff from HEAD to index and index to working tree and combines them.
+    func diff(to diffOption: DiffOption = .workingTree) throws -> Diff {
+        // TODO: Implement diff options and source commit as parameter
+
         // Get the HEAD commit
-        guard let headCommit = try HEAD.target as? Commit else {
-            throw RepositoryError.failedToGetDiff("Failed to get the HEAD commit")
+        let headCommit = (try? HEAD.target) as? Commit
+
+        // Get the HEAD commit tree
+        let headTreePointer: OpaquePointer? = if let headCommit {
+            try ObjectFactory.lookupObjectPointer(
+                oid: headCommit.tree.id.raw,
+                type: GIT_OBJECT_TREE,
+                repositoryPointer: pointer
+            )
+        } else { nil }
+        defer { git_object_free(headTreePointer) }
+
+        // Get the diff object
+        var diffPointer: OpaquePointer?
+        defer { git_diff_free(diffPointer) }
+
+        let diffStatus: Int32 = switch diffOption {
+        case .workingTree:
+            git_diff_index_to_workdir(&diffPointer, pointer, nil, nil)
+        case .index:
+            git_diff_tree_to_index(&diffPointer, pointer, headTreePointer, nil, nil)
+        case [.workingTree, .index]:
+            git_diff_tree_to_workdir_with_index(&diffPointer, pointer, headTreePointer, nil)
+        default:
+            throw RepositoryError.failedToGetDiff("Invalid diff option")
         }
 
-        return try diff(commit: headCommit)
+        guard let diffPointer, diffStatus == GIT_OK.rawValue else {
+            let errorMessage = String(cString: git_error_last().pointee.message)
+            throw RepositoryError.failedToGetDiff(errorMessage)
+        }
+
+        return Diff(pointer: diffPointer)
     }
 
     /// Get the diff between given commit and its parent.
@@ -1010,14 +1051,7 @@ public extension Repository {
     /// - Warning: The objects should be commit, tree, or tag objects.
     /// Blob objects are not supported.
     func diff(from fromObject: any Object, to toObject: any Object) throws -> Diff {
-        // Get the diff options
-        var diffOptions = git_diff_options()
-        let optionsInitStatus = git_diff_init_options(&diffOptions, UInt32(GIT_DIFF_OPTIONS_VERSION))
-
-        guard optionsInitStatus == GIT_OK.rawValue else {
-            let errorMessage = String(cString: git_error_last().pointee.message)
-            throw RepositoryError.failedToGetDiff(errorMessage)
-        }
+        // TODO: Implement diff options
 
         // Get the tree pointers
         let fromObjectTreePointer = try ObjectFactory.peelObjectPointer(
@@ -1043,7 +1077,7 @@ public extension Repository {
             pointer,
             fromObjectTreePointer,
             toObjectTreePointer,
-            &diffOptions
+            nil
         )
 
         guard let diffPointer, diffStatus == GIT_OK.rawValue else {

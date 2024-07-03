@@ -2,11 +2,24 @@ import libgit2
 
 /// Represents the differences between two trees.
 public struct Diff: Equatable, Hashable {
-    /// The changes in the diff
+    /// The changed files in the diff.
+    ///
+    /// Each delta represents a file change. The delta contains the status of the change,
+    /// the old and new file, and the flags.
+    ///
+    /// If you want to get each file change in detail, you can use the `patches` property.
+    /// It provides changes line by line. Each patch represents a file change.
     public let changes: [Delta]
+
+    /// The file patches in the diff. Each patch represents a file change.
+    ///
+    /// A patch is a collection of hunks that represent the changes in a file.
+    /// Each hunk is a collection of lines that represent the changes in a specific part of the file.
+    public let patches: [Patch]
 
     init(pointer: OpaquePointer) {
         var deltas = [Delta]()
+        var patches = [Patch]()
 
         // Get the number of deltas in the diff
         let numberOfDeltas = git_diff_num_deltas(pointer)
@@ -15,6 +28,7 @@ public struct Diff: Equatable, Hashable {
         for index in 0 ..< numberOfDeltas {
             let deltaPointer = git_diff_get_delta(pointer, index)
 
+            // Skip if the delta is nil
             guard let rawDelta = deltaPointer?.pointee else {
                 continue
             }
@@ -23,9 +37,26 @@ public struct Diff: Equatable, Hashable {
             let delta = Delta(raw: rawDelta)
 
             deltas.append(delta)
+
+            // Create patches
+            var patchPointer: OpaquePointer?
+
+            let patchStatus = git_patch_from_diff(&patchPointer, pointer, index)
+
+            if let patchPointer, patchStatus == GIT_OK.rawValue {
+                let patch = Patch(pointer: patchPointer)
+                patches.append(patch)
+
+                // Write patch to buf
+                var buf = git_buf()
+                git_patch_to_buf(&buf, patchPointer)
+                let str = String(cString: buf.ptr)
+                print(str)
+            }
         }
 
         changes = deltas
+        self.patches = patches
     }
 }
 
