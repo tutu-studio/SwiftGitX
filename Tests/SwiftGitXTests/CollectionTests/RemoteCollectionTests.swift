@@ -104,7 +104,7 @@ final class RemoteCollectionTests: SwiftGitXTestCase {
         XCTAssertEqual(Set(remotes), Set(remoteLookups))
     }
 
-    func testRemoteIterator() async throws {
+    func testRemoteIterator() throws {
         // Create a mock repository at the temporary directory
         let repository = Repository.mock(named: "test-remote-iterator", in: Self.directory)
 
