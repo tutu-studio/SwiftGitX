@@ -15,7 +15,7 @@ final class IndexCollectionTests: SwiftGitXTestCase {
         // Verify that the file is staged
         let statusEntry = try XCTUnwrap(repository.status().first)
 
-        XCTAssertEqual(statusEntry.status, .indexNew) // The file is staged
+        XCTAssertEqual(statusEntry.status, [.indexNew]) // The file is staged
         XCTAssertEqual(statusEntry.index?.newFile.path, "README.md")
         XCTAssertNil(statusEntry.workingTree) // The file is staged and not in the working tree anymore
     }
@@ -33,7 +33,7 @@ final class IndexCollectionTests: SwiftGitXTestCase {
         // Verify that the file is staged
         let statusEntry = try XCTUnwrap(repository.status().first)
 
-        XCTAssertEqual(statusEntry.status, .indexNew) // The file is staged
+        XCTAssertEqual(statusEntry.status, [.indexNew]) // The file is staged
         XCTAssertEqual(statusEntry.index?.newFile.path, "README.md")
         XCTAssertNil(statusEntry.workingTree) // The file is staged and not in the working tree anymore
     }
@@ -54,7 +54,7 @@ final class IndexCollectionTests: SwiftGitXTestCase {
         let statusEntries = try repository.status()
 
         XCTAssertEqual(statusEntries.count, files.count)
-        XCTAssertEqual(statusEntries.map(\.status), Array(repeating: .indexNew, count: files.count))
+        XCTAssertEqual(statusEntries.map(\.status), Array(repeating: [.indexNew], count: files.count))
         XCTAssertEqual(statusEntries.map(\.index?.newFile.path), files.map(\.lastPathComponent))
         XCTAssertEqual(statusEntries.map(\.workingTree), Array(repeating: nil, count: files.count))
     }
@@ -75,7 +75,7 @@ final class IndexCollectionTests: SwiftGitXTestCase {
         let statusEntries = try repository.status()
 
         XCTAssertEqual(statusEntries.count, files.count)
-        XCTAssertEqual(statusEntries.map(\.status), Array(repeating: .indexNew, count: files.count))
+        XCTAssertEqual(statusEntries.map(\.status), Array(repeating: [.indexNew], count: files.count))
         XCTAssertEqual(statusEntries.map(\.index?.newFile.path), files.map(\.lastPathComponent))
         XCTAssertEqual(statusEntries.map(\.workingTree), Array(repeating: nil, count: files.count))
     }
@@ -98,7 +98,7 @@ final class IndexCollectionTests: SwiftGitXTestCase {
         // Verify that the file is not staged
         let statusEntry = try XCTUnwrap(repository.status().first)
 
-        XCTAssertEqual(statusEntry.status, .workingTreeNew)
+        XCTAssertEqual(statusEntry.status, [.workingTreeNew])
         XCTAssertNil(statusEntry.index) // The file is not staged
     }
 
@@ -118,7 +118,7 @@ final class IndexCollectionTests: SwiftGitXTestCase {
         // Verify that the file is not staged
         let statusEntry = try XCTUnwrap(repository.status().first)
 
-        XCTAssertEqual(statusEntry.status, .workingTreeNew)
+        XCTAssertEqual(statusEntry.status, [.workingTreeNew])
         XCTAssertNil(statusEntry.index) // The file is not staged
     }
 
@@ -141,7 +141,7 @@ final class IndexCollectionTests: SwiftGitXTestCase {
         let statusEntries = try repository.status()
 
         XCTAssertEqual(statusEntries.count, files.count)
-        XCTAssertEqual(statusEntries.map(\.status), Array(repeating: .workingTreeNew, count: files.count))
+        XCTAssertEqual(statusEntries.map(\.status), Array(repeating: [.workingTreeNew], count: files.count))
         XCTAssertEqual(statusEntries.map(\.index), Array(repeating: nil, count: files.count))
     }
 
@@ -164,7 +164,7 @@ final class IndexCollectionTests: SwiftGitXTestCase {
         let statusEntries = try repository.status()
 
         XCTAssertEqual(statusEntries.count, files.count)
-        XCTAssertEqual(statusEntries.map(\.status), Array(repeating: .workingTreeNew, count: files.count))
+        XCTAssertEqual(statusEntries.map(\.status), Array(repeating: [.workingTreeNew], count: files.count))
         XCTAssertEqual(statusEntries.map(\.index), Array(repeating: nil, count: files.count))
     }
 

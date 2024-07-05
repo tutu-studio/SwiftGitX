@@ -308,7 +308,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         let statusEntry = try XCTUnwrap(status.first)
 
         // Check the status entry properties
-        XCTAssertEqual(statusEntry.status, .workingTreeNew)
+        XCTAssertEqual(statusEntry.status, [.workingTreeNew])
         XCTAssertNil(statusEntry.index) // There is no index changes
 
         // Get working tree changes
@@ -344,7 +344,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         let statusEntry = try XCTUnwrap(status.first)
 
         // Check the status entry properties
-        XCTAssertEqual(statusEntry.status, .indexNew)
+        XCTAssertEqual(statusEntry.status, [.indexNew])
         XCTAssertNil(statusEntry.workingTree) // There is no working tree changes
         let statusEntryDiffDelta = try XCTUnwrap(statusEntry.index)
 
@@ -383,7 +383,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         XCTAssertEqual(status.count, 2)
 
         // Check the status entry properties
-        XCTAssertEqual(Set(status), Set([.indexNew, .workingTreeModified]))
+        XCTAssertEqual(status, [.indexNew, .workingTreeModified])
     }
 
     func testDiffEquality() throws {
