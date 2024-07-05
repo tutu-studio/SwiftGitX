@@ -11,6 +11,9 @@ public enum OIDError: Error {
 ///
 /// You can also get an abbreviated version of the OID which is an 8-byte length hex string.
 public struct OID: LibGit2RawRepresentable {
+    /// The zero (null) OID.
+    public static let zero: OID = .init(raw: git_oid(id: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
+
     /// The libgit2 git_oid struct that this OID wraps.
     let raw: git_oid
 

@@ -20,6 +20,17 @@ final class ObjectTests: SwiftGitXTestCase {
         git_oid_fromstr(&rawOID, shaHex)
 
         XCTAssertEqual(oid, OID(raw: rawOID))
+
+        // Test OID is zero
+        let zeroOID = OID.zero
+
+        XCTAssertEqual(zeroOID.hex, "0000000000000000000000000000000000000000")
+        XCTAssertEqual(zeroOID.abbreviated, "00000000")
+
+        var zeroOIDRaw = zeroOID.raw
+        XCTAssertEqual(git_oid_is_zero(&zeroOIDRaw), 1)
+
+        XCTAssertEqual(zeroOID, .zero)
     }
 
     func testCommit() throws {
