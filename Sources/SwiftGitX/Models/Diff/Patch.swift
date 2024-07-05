@@ -138,7 +138,7 @@ public struct Patch: Equatable, Hashable {
         ///
         /// If the line has no newline character at the end,
         /// it can be a context EOF, an addition EOF, or a deletion EOF.
-        public enum LineType: Character {
+        public enum LineType: String {
             case context = " "
             case addition = "+"
             case deletion = "-"
