@@ -58,8 +58,8 @@ public struct Diff: Equatable, Hashable {
 
 public extension Diff {
     struct Delta: LibGit2RawRepresentable {
-        /// The status of the delta.
-        public let status: Status
+        /// The type of the delta.
+        public let type: DeltaType
 
         /// The `oldFile` represents the "from" side of the diff.
         public let oldFile: File
@@ -80,7 +80,7 @@ public extension Diff {
         let raw: git_diff_delta
 
         init(raw: git_diff_delta) {
-            status = Status(rawValue: Int(raw.status.rawValue))!
+            type = DeltaType(rawValue: Int(raw.status.rawValue))!
 
             oldFile = File(raw: raw.old_file)
             newFile = File(raw: raw.new_file)
@@ -93,7 +93,7 @@ public extension Diff {
         }
 
         public static func == (lhs: Diff.Delta, rhs: Diff.Delta) -> Bool {
-            lhs.status == rhs.status &&
+            lhs.type == rhs.type &&
                 lhs.oldFile == rhs.oldFile &&
                 lhs.newFile == rhs.newFile &&
                 lhs.flags == rhs.flags &&
@@ -102,7 +102,7 @@ public extension Diff {
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(status)
+            hasher.combine(type)
             hasher.combine(oldFile)
             hasher.combine(newFile)
             hasher.combine(flags)
@@ -205,9 +205,10 @@ public extension Diff {
     }
 }
 
-public extension Diff.Delta {
+public extension Diff {
     // Represents git_delta_t enum in libgit2
-    enum Status: Int {
+    /// Represents what type of change is described by ``Delta``.
+    enum DeltaType: Int {
         /// No changes
         case unmodified = 0
 

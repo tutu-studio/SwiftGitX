@@ -163,7 +163,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         // Check the change
         XCTAssertEqual(change.oldFile.path, "README.md")
         XCTAssertEqual(change.newFile.path, "README.md")
-        XCTAssertEqual(change.status, .modified)
+        XCTAssertEqual(change.type, .modified)
 
         // Get the blob of the new file
         let newBlob: Blob = try repository.show(id: change.newFile.id)
@@ -192,7 +192,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         // Check the change
         XCTAssertEqual(change.oldFile.path, "README.md")
         XCTAssertEqual(change.newFile.path, "README.md")
-        XCTAssertEqual(change.status, .modified)
+        XCTAssertEqual(change.type, .modified)
 
         // Get the blob of the new file
         let newBlob: Blob = try repository.show(id: change.newFile.id)
@@ -227,7 +227,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         // Check the change
         XCTAssertEqual(change.oldFile.path, "README.md")
         XCTAssertEqual(change.newFile.path, "README.md")
-        XCTAssertEqual(change.status, .modified)
+        XCTAssertEqual(change.type, .modified)
 
         // Get the blob of the new file
         let newBlob: Blob = try repository.show(id: change.newFile.id)
@@ -260,7 +260,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         let change = try XCTUnwrap(diff.changes.first)
 
         // Check the change
-        XCTAssertEqual(change.status, .modified)
+        XCTAssertEqual(change.type, .modified)
         XCTAssertEqual(change.oldFile.path, "README.md")
         XCTAssertEqual(change.newFile.path, "README.md")
 
@@ -315,7 +315,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         let workingTreeChanges = try XCTUnwrap(statusEntry.workingTree)
 
         // Check the status entry diff delta properties
-        XCTAssertEqual(workingTreeChanges.status, .untracked)
+        XCTAssertEqual(workingTreeChanges.type, .untracked)
 
         XCTAssertEqual(workingTreeChanges.newFile.path, "README.md")
         XCTAssertEqual(workingTreeChanges.oldFile.path, "README.md")
@@ -349,7 +349,7 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         let statusEntryDiffDelta = try XCTUnwrap(statusEntry.index)
 
         // Check the status entry diff delta properties
-        XCTAssertEqual(statusEntryDiffDelta.status, .added)
+        XCTAssertEqual(statusEntryDiffDelta.type, .added)
 
         XCTAssertEqual(statusEntryDiffDelta.newFile.path, "README.md")
         XCTAssertEqual(statusEntryDiffDelta.oldFile.path, "README.md")
