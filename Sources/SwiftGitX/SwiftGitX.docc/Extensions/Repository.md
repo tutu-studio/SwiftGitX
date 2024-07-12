@@ -40,7 +40,7 @@
 
 ### Diff
 
-- ``diff()``
+- ``diff(to:)``
 - ``diff(commit:)``
 - ``diff(from:to:)``
 
@@ -50,6 +50,12 @@
 - ``log(from:sorting:)-2c8fu``
 - ``log(from:sorting:)-3rteq``
 - ``LogSortingOption``
+
+### Patch
+
+- ``patch(from:)``
+- ``patch(from:to:)-10g8i``
+- ``patch(from:to:)-957bd``
 
 ### Restore
 

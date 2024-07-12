@@ -966,7 +966,7 @@ public extension Repository {
         return try status(path: path)
     }
 
-    /// Creates a diff of current changes.
+    /// Creates a diff of current changes in the repository.
     ///
     /// - Returns: The diff of the current changes.
     ///
