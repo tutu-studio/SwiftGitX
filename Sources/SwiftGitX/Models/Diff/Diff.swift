@@ -7,7 +7,7 @@ public struct Diff: Equatable, Hashable {
     /// Each delta represents a file change. The delta contains the status of the change,
     /// the old and new file, and the flags.
     ///
-    /// If you want to get each file change in detail, you can use the `patches` property.
+    /// If you want to get each file change in detail, you can use the ``patches`` property.
     /// It provides changes line by line. Each patch represents a file change.
     public let changes: [Delta]
 
