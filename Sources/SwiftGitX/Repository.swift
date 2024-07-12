@@ -947,7 +947,6 @@ public extension Repository {
         return StatusEntry.Status.from(statusFlags)
     }
 
-    // ? Should we return Set<StatusEntry.Status> instead of [StatusEntry.Status]?
     /// Get the status of the specified file.
     ///
     /// - Parameter file: The file URL.
