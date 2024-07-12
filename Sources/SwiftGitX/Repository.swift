@@ -30,7 +30,7 @@ public enum RepositoryError: Error {
     case failedToSwitch(String)
 
     case failedToGetStatus(String)
-    case failedToGetDiff(String)
+    case failedToCreateDiff(String)
     case failedToCreatePatch(String)
 
     case failedToPush(String)
@@ -1009,12 +1009,12 @@ public extension Repository {
         case [.workingTree, .index]:
             git_diff_tree_to_workdir_with_index(&diffPointer, pointer, headTreePointer, nil)
         default:
-            throw RepositoryError.failedToGetDiff("Invalid diff option")
+            throw RepositoryError.failedToCreateDiff("Invalid diff option")
         }
 
         guard let diffPointer, diffStatus == GIT_OK.rawValue else {
             let errorMessage = String(cString: git_error_last().pointee.message)
-            throw RepositoryError.failedToGetDiff(errorMessage)
+            throw RepositoryError.failedToCreateDiff(errorMessage)
         }
 
         return Diff(pointer: diffPointer)
@@ -1082,7 +1082,7 @@ public extension Repository {
 
         guard let diffPointer, diffStatus == GIT_OK.rawValue else {
             let errorMessage = String(cString: git_error_last().pointee.message)
-            throw RepositoryError.failedToGetDiff(errorMessage)
+            throw RepositoryError.failedToCreateDiff(errorMessage)
         }
 
         return Diff(pointer: diffPointer)
