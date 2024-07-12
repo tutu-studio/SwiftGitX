@@ -405,4 +405,147 @@ final class RepositoryDiffTests: SwiftGitXTestCase {
         // Check the diff properties are equal between the two repositories
         XCTAssertEqual(sameDiff, diff)
     }
+
+    func testPatchCreateFromBlobs() throws {
+        // Create a repository at the directory
+        let repository = Repository.mock(named: "test-patch-create-from-blobs", in: Self.directory)
+
+        // Create a commit
+        let file = try repository.mockFile(named: "README.md", content: "The old data!\n")
+        try repository.mockCommit(file: file)
+
+        // Update the file content and add the file
+        try Data("The new data!\n".utf8).write(to: file)
+        // * The working tree file does not have a blob object, so we need to add the file at least.
+        try repository.add(file: file)
+
+        // Get the status of the file
+        let status = try XCTUnwrap(repository.status().first)
+        XCTAssertEqual(status.status, [.indexModified])
+
+        // Lookup blobs
+        let oldBlobID = try XCTUnwrap(status.index?.oldFile.id)
+        let oldBlob: Blob = try XCTUnwrap(repository.show(id: oldBlobID))
+
+        let newBlobID = try XCTUnwrap(status.index?.newFile.id)
+        let newBlob: Blob = try XCTUnwrap(repository.show(id: newBlobID))
+
+        // Create patch from status blobs
+        let patch = try repository.patch(from: oldBlob, to: newBlob)
+
+        // Check the patch properties
+        XCTAssertEqual(patch.hunks.count, 1)
+        XCTAssertEqual(patch.hunks[0].lines[0].content, "The old data!\n")
+        XCTAssertEqual(patch.hunks[0].lines[1].content, "The new data!\n")
+    }
+
+    func testPatchCreateFromBlobToFile() throws {
+        // Create a repository at the directory
+        let repository = Repository.mock(named: "test-patch-create-from-blob-to-file", in: Self.directory)
+
+        // Create a commit
+        let file = try repository.mockFile(named: "README.md", content: "The old data!\n")
+        try repository.mockCommit(file: file)
+
+        // Update the file content and add the file
+        try Data("The new data!\n".utf8).write(to: file)
+
+        // Get the status of the file
+        let status = try XCTUnwrap(repository.status().first)
+        XCTAssertEqual(status.status, [.workingTreeModified])
+
+        // Lookup blobs
+        let oldBlobID = try XCTUnwrap(status.workingTree?.oldFile.id)
+        let oldBlob: Blob = try XCTUnwrap(repository.show(id: oldBlobID))
+
+        // Create patch from status blobs
+        let patch = try repository.patch(from: oldBlob, to: file)
+
+        // Check the patch properties
+        XCTAssertEqual(patch.hunks.count, 1)
+        XCTAssertEqual(patch.hunks[0].lines[0].content, "The old data!\n")
+        XCTAssertEqual(patch.hunks[0].lines[1].content, "The new data!\n")
+    }
+
+    func testPatchCreateFromDelta_Modified() throws {
+        // Create a repository at the directory
+        let repository = Repository.mock(named: "test-patch-create-from-delta--modified", in: Self.directory)
+
+        // Create a commit
+        let file = try repository.mockFile(named: "README.md", content: "The old data!\n")
+        try repository.mockCommit(file: file)
+
+        // Update the file content and add the file
+        try Data("The new data!\n".utf8).write(to: file)
+
+        // Get the status of the file
+        let status: StatusEntry = try XCTUnwrap(repository.status().first)
+        XCTAssertEqual(status.status, [.workingTreeModified])
+        let workingTreeDelta = try XCTUnwrap(status.workingTree)
+
+        // Create patch from workingTree delta
+        let workingTreePatch = try XCTUnwrap(repository.patch(from: workingTreeDelta))
+
+        // Check the patch properties
+        XCTAssertEqual(workingTreePatch.hunks.count, 1)
+        XCTAssertEqual(workingTreePatch.hunks[0].lines[0].content, "The old data!\n")
+        XCTAssertEqual(workingTreePatch.hunks[0].lines[1].content, "The new data!\n")
+    }
+
+    func testPatchCreateFromDelta_Indexed() throws {
+        // Create a repository at the directory
+        let repository = Repository.mock(named: "test-patch-create-from-delta--indexed", in: Self.directory)
+
+        // Create a commit
+        let file = try repository.mockFile(named: "README.md", content: "The old data!\n")
+        try repository.mockCommit(file: file)
+
+        // Update the file content and add the file
+        try Data("The new data!\n".utf8).write(to: file)
+        try repository.add(file: file)
+
+        // Get the status of the file
+        let status: StatusEntry = try XCTUnwrap(repository.status().first)
+        XCTAssertEqual(status.status, [.indexModified])
+        let indexDelta = try XCTUnwrap(status.index)
+
+        // Create patch from workingTree delta
+        let indexPatch = try XCTUnwrap(repository.patch(from: indexDelta))
+
+        // Check the patch properties
+        XCTAssertEqual(indexPatch.hunks.count, 1)
+        XCTAssertEqual(indexPatch.hunks[0].lines[0].content, "The old data!\n")
+        XCTAssertEqual(indexPatch.hunks[0].lines[1].content, "The new data!\n")
+    }
+
+    func testPatchCreateFromDelta_Untracked() throws {
+        // Create a repository at the directory
+        let repository = Repository.mock(named: "test-patch-create-from-delta--untracked", in: Self.directory)
+
+        // Create a new file in the repository
+        _ = try repository.mockFile(named: "README.md", content: "Hello, World!\n")
+
+        // Get the status of the file
+        let status: StatusEntry = try XCTUnwrap(repository.status().first)
+        XCTAssertEqual(status.status, [.workingTreeNew]) // The file is untracked
+        let workingTreeDelta = try XCTUnwrap(status.workingTree)
+
+        // Create patch from workingTree delta
+        let workingTreePatch = try XCTUnwrap(repository.patch(from: workingTreeDelta))
+
+        // Check the patch properties
+        XCTAssertEqual(workingTreePatch.hunks.count, 1)
+        XCTAssertEqual(workingTreePatch.hunks[0].lines[0].content, "Hello, World!\n")
+    }
+
+    func testPatchCreateEmptyBlobs() throws {
+        // Create a repository at the directory
+        let repository = Repository.mock(named: "test-patch-create-empty-blobs", in: Self.directory)
+
+        // Create patch from empty blobs
+        let patch = try repository.patch(from: nil, to: nil)
+
+        // Check the patch properties
+        XCTAssertEqual(patch.hunks.count, 0)
+    }
 }
