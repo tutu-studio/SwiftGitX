@@ -868,7 +868,7 @@ public extension Repository {
     /// - Throws: `RepositoryError.failedToGetStatus` if the status operation fails.
     ///
     /// The status of the repository is represented by an array of `StatusEntry` values.
-    func status(options optionFlags: StatusOption = .includeUntracked) throws -> [StatusEntry] {
+    func status(options optionFlags: StatusOption = .default) throws -> [StatusEntry] {
         // Initialize the status options
         var statusOptions = git_status_options()
         let optionsInitStatus = git_status_options_init(&statusOptions, UInt32(GIT_STATUS_OPTIONS_VERSION))

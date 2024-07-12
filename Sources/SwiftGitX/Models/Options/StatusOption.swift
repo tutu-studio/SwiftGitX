@@ -16,6 +16,8 @@ public struct StatusOption: OptionSet, Sendable {
         self.rawValue = rawValue
     }
 
+    public static let `default`: StatusOption = [.includeUntracked, .recurseUntrackedDirectories]
+
     // TODO: Add documentation considering the libgit2 documentation of git_status_opt_t
 
     public static let includeUntracked = StatusOption(GIT_STATUS_OPT_INCLUDE_UNTRACKED)
