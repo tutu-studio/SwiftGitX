@@ -39,7 +39,7 @@ public struct StatusEntry: LibGit2RawRepresentable {
     /// This enumeration provides a detailed status of files in a Git repository. Each case corresponds to a specific
     /// status that a file can have in the repository, similar to the output of the `git status` command.
     public enum Status {
-        /// The file is tracked and its content has no changes.
+        /// The file is `tracked` and its content has no changes.
         case current
 
         /// The file is `untracked` and it is staged.
@@ -47,55 +47,58 @@ public struct StatusEntry: LibGit2RawRepresentable {
         /// This is a file that is in the index which is not tracked earlier by Git.
         case indexNew
 
-        /// The file is modified and staged.
+        /// The file has been modified and the changes are staged.
         ///
         /// This is a `tracked` file that has changes and it's in the index.
         case indexModified
 
-        /// The file is deleted and staged.
+        /// The file has been deleted and this deletion is staged.
         ///
         /// This is a `tracked` file that is deleted and it's in the index.
         case indexDeleted
 
-        /// The file is renamed and staged.
+        /// The file has been renamed and this change is staged in the index.
         ///
         /// This is a `tracked` file that is renamed and staged.
         case indexRenamed
 
-        /// The file's type is changed and staged.
+        /// The file type has changed (e.g., from regular file to symlink) and this change is staged in the index.
         ///
         /// This is a `tracked` file that has its type changed and staged.
         case indexTypeChange
 
-        /// The file is `untracked` and in the working tree (not staged).
+        /// The file is new and `untracked` in the working directory.
         ///
         /// This is a file that is not staged yet and not tracked by Git. Newly created files are in this state.
         case workingTreeNew
 
-        /// The file is modified which in the working tree.
+        /// The file has been modified in the working directory but the changes are not yet staged.
         ///
         /// This is a `tracked` file that has changes and it's in the working tree.
         case workingTreeModified
 
-        /// The file is deleted in the working tree.
+        /// The file has been deleted from the working directory but the deletion is not yet staged.
         ///
         /// This is a `tracked` file that is deleted and it's in the working tree.
         case workingTreeDeleted
 
-        /// The file is renamed in the working tree.
+        /// The file has been renamed in the working directory but the change is not yet staged.
         ///
         /// This is a `tracked` file that is renamed and it's in the working tree.
         case workingTreeRenamed
 
-        /// The file's type is changed in the working tree.
+        /// The file type has changed in the working directory but the change is not yet staged.
         ///
         /// This is a `tracked` file that has its type changed and it's in the working tree.
         case workingTreeTypeChange
 
+        /// The file is unreadable in the working directory, possibly due to permissions or other issues.
         case workingTreeUnreadable
 
+        /// The file is ignored by Git (typically specified in `.gitignore`).
         case ignored
 
+        /// The file has conflicts, usually as a result of a merge or rebase operation.
         case conflicted
 
         static func from(_ flags: UInt32) -> [Status] {
