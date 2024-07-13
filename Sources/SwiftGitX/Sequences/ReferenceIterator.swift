@@ -21,11 +21,11 @@ public class ReferenceIterator: IteratorProtocol {
 
     public func next() -> (any Reference)? {
         var referencePointer: OpaquePointer?
-        defer { git_reference_free(referencePointer) }
 
         while true {
             // Get the next reference
             let status = git_reference_next(&referencePointer, referenceIterator)
+            defer { git_reference_free(referencePointer) }
 
             // Check if the status is ITEROVER. If so, return nil
             if status == GIT_ITEROVER.rawValue { return nil }
