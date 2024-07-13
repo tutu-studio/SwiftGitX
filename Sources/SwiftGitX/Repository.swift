@@ -1134,6 +1134,8 @@ public extension Repository {
 
         // Create the patch object
         var patchPointer: OpaquePointer?
+        defer { git_patch_free(patchPointer) }
+
         let patchStatus = git_patch_from_blobs(&patchPointer, oldBlobPointer, nil, newBlobPointer, nil, nil)
 
         guard let patchPointer, patchStatus == GIT_OK.rawValue else {
@@ -1169,6 +1171,8 @@ public extension Repository {
 
         // Create the patch object
         var patchPointer: OpaquePointer?
+        defer { git_patch_free(patchPointer) }
+
         let patchStatus = git_patch_from_blob_and_buffer(
             &patchPointer,
             blobPointer,

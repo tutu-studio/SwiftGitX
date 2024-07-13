@@ -28,21 +28,21 @@ public struct Diff: Equatable, Hashable {
         for index in 0 ..< numberOfDeltas {
             let deltaPointer = git_diff_get_delta(pointer, index)
 
-            // Skip if the delta is nil
-            guard let rawDelta = deltaPointer?.pointee else {
-                continue
+            // If delta pointer is not nil, create a new delta
+            if let rawDelta = deltaPointer?.pointee {
+                // Create a new delta from the raw delta
+                let delta = Delta(raw: rawDelta)
+                // Append the delta to the array
+                deltas.append(delta)
             }
-
-            // Create a new delta from the raw delta
-            let delta = Delta(raw: rawDelta)
-
-            deltas.append(delta)
 
             // Create patches
             var patchPointer: OpaquePointer?
+            defer { git_patch_free(patchPointer) }
 
             let patchStatus = git_patch_from_diff(&patchPointer, pointer, index)
 
+            // If the patch pointer is not nil, create a new patch
             if let patchPointer, patchStatus == GIT_OK.rawValue {
                 let patch = Patch(pointer: patchPointer)
                 patches.append(patch)
