@@ -101,10 +101,12 @@ public struct BranchCollection: Sequence {
         }
 
         var branches = [Branch]()
-        var branchPointer: OpaquePointer?
         var branchType = type.raw
 
         while true {
+            var branchPointer: OpaquePointer?
+            defer { git_reference_free(branchPointer) }
+
             let nextStatus = git_branch_next(&branchPointer, &branchType, branchIterator)
 
             if nextStatus == GIT_ITEROVER.rawValue {
