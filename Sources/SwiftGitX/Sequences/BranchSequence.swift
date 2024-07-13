@@ -35,12 +35,12 @@ public class BranchIterator: IteratorProtocol {
 
     public func next() -> Branch? {
         var branchPointer: OpaquePointer?
-        defer { git_reference_free(branchPointer) }
+        var type = type.raw
 
         while true {
             // Get the next branch
-            var type = type.raw
             let status = git_branch_next(&branchPointer, &type, branchIterator)
+            defer { git_reference_free(branchPointer) }
 
             // Check if the status is ITEROVER. If so, return nil
             if status == GIT_ITEROVER.rawValue { return nil }
