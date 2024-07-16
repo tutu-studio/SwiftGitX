@@ -50,15 +50,18 @@ public final class Repository {
         self.pointer = pointer
     }
 
-    /// Initialize a new repository at the specified path.
+    /// Open or create a repository at the specified path.
+    ///
+    /// - Parameters:
+    ///   - path: The path to the repository.
+    ///   - createIfNotExists: If `true`, create a new repository if there is no repository at the given path.
+    /// Default is `true`.
     ///
     /// If a repository exists at the specified path, it will be opened.
     /// If a repository does not exist, a new one will be created.
     ///
-    /// - Parameter path: The path to the repository.
-    ///
-    /// - Throws: `RepositoryError.failedToCreate` if the repository cannot be created.
-    public init(at path: URL) throws {
+    /// The `path` argument must point to either an existing working directory, or a `.git` repository folder to open.
+    public init(at path: URL, createIfNotExists: Bool = true) throws {
         var pointer: OpaquePointer?
 
         // Try to open the repository at the specified path
@@ -66,7 +69,7 @@ public final class Repository {
 
         if let pointer, statusOpen == GIT_OK.rawValue {
             self.pointer = pointer
-        } else {
+        } else if createIfNotExists {
             // If the repository does not exist, create a new one
             let statusCreate = git_repository_init(&pointer, path.path, 0)
 
@@ -76,6 +79,8 @@ public final class Repository {
             }
 
             self.pointer = pointer
+        } else {
+            throw RepositoryError.failedToOpen("Repository not found at \(path.path)")
         }
     }
 

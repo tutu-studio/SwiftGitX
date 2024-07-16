@@ -4,7 +4,7 @@
 
 ### Creating a Repository
 
-- ``init(at:)``
+- ``init(at:createIfNotExists:)``
 - ``open(at:)``
 - ``create(at:isBare:)``
 - ``clone(from:to:options:)``
