@@ -41,7 +41,7 @@ public enum RepositoryError: Error {
 // MARK: - Repository
 
 /// A representation of a Git repository.
-public class Repository {
+public final class Repository {
     /// The libgit2 pointer of the repository.
     private let pointer: OpaquePointer
 
