@@ -13,12 +13,12 @@ extension Repository {
     ///   - parentDirectoryName: The name of the parent directory to create the repository in.
     ///
     /// - Returns: The created repository.
-    static func mock(named name: String, in parentDirectoryName: String) -> Repository {
+    static func mock(named name: String, in parentDirectoryName: String, isBare: Bool = false) -> Repository {
         do {
             let directory = mockDirectory(named: name, in: parentDirectoryName)
 
             // Create a new repository at the temporary directory
-            return try Repository.create(at: directory)
+            return try Repository.create(at: directory, isBare: isBare)
         } catch {
             fatalError("Failed to create a mock repository: \(error)")
         }

@@ -44,6 +44,36 @@ final class RepositoryPropertyTests: SwiftGitXTestCase {
         XCTAssertEqual(repositoryWorkingDirectory.resolvingSymlinksInPath(), expectedDirectory)
     }
 
+    func testRepositoryPath() throws {
+        // Create a new repository at the temporary directory
+        let repository = Repository.mock(named: "test-path", in: Self.directory)
+
+        // Get the path of the mock repository directory
+        let expectedDirectory = if Self.directory.isEmpty {
+            URL.temporaryDirectory.appending(components: "SwiftGitXTests", "test-path/.git/")
+        } else {
+            URL.temporaryDirectory.appending(components: "SwiftGitXTests", Self.directory, "test-path/.git/")
+        }
+
+        // Check if the path is the same as the expected directory
+        XCTAssertEqual(repository.path.resolvingSymlinksInPath(), expectedDirectory)
+    }
+
+    func testRepositoryPath_Bare() {
+        // Create a new repository at the temporary directory
+        let repository = Repository.mock(named: "test-path-bare", in: Self.directory, isBare: true)
+
+        // Get the path of the mock repository directory
+        let expectedDirectory = if Self.directory.isEmpty {
+            URL.temporaryDirectory.appending(components: "SwiftGitXTests", "test-path-bare/")
+        } else {
+            URL.temporaryDirectory.appending(components: "SwiftGitXTests", Self.directory, "test-path-bare/")
+        }
+
+        // Check if the path is the same as the expected directory
+        XCTAssertEqual(repository.path.resolvingSymlinksInPath(), expectedDirectory)
+    }
+
     func testRepositoryIsEmpty() throws {
         // Create a new repository at the temporary directory
         let repository = Repository.mock(named: "test-is-empty", in: Self.directory)

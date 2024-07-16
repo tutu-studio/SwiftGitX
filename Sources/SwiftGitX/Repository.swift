@@ -106,6 +106,19 @@ public extension Repository {
         }
     }
 
+    /// The path of the repository.
+    ///
+    /// - Returns: The `.git` directory path. (e.g. /path/to/repo/.git)
+    ///
+    /// This is the path of the `.git` folder for normal repositories, or of the repository itself for `bare`
+    /// repositories.
+    ///
+    /// - Note: Use ``workingDirectory`` to get the working directory path.
+    var path: URL {
+        // ? Should we handle `nil` case?
+        URL(fileURLWithPath: String(cString: git_repository_path(pointer)))
+    }
+
     /// Check if the repository is empty.
     ///
     /// A repository is considered empty if it has no commits.
