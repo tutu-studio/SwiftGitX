@@ -1216,7 +1216,7 @@ public extension Repository {
 
             // Create a patch from the old blob to the new blob
             return try patch(from: oldBlob, to: newBlob)
-        case .modified:
+        case .modified, .renamed:
             let oldBlobID = delta.oldFile.id
             let oldBlob: Blob = try show(id: oldBlobID)
 
