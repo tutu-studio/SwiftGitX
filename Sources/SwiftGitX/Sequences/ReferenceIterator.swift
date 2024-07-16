@@ -23,6 +23,9 @@ public class ReferenceIterator: IteratorProtocol {
         var referencePointer: OpaquePointer?
 
         while true {
+            // Task should not be cancelled
+            if Task.isCancelled { return nil }
+
             // Get the next reference
             let status = git_reference_next(&referencePointer, referenceIterator)
             defer { git_reference_free(referencePointer) }

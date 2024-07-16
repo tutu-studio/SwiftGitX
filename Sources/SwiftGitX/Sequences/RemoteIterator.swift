@@ -13,6 +13,9 @@ public struct RemoteIterator: IteratorProtocol {
 
     public mutating func next() -> Remote? {
         while true {
+            // Task should not be cancelled
+            if Task.isCancelled { return nil }
+
             // Check if the index is out of bounds
             guard index < remoteNames.count else { return nil }
 

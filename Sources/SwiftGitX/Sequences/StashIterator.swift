@@ -7,6 +7,9 @@ public struct StashIterator: IteratorProtocol {
     }
 
     public mutating func next() -> StashEntry? {
+        // Task should not be cancelled
+        if Task.isCancelled { return nil }
+
         guard index < entries.count else { return nil }
 
         defer { index += 1 }

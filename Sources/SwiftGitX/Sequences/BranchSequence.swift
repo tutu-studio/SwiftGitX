@@ -38,6 +38,9 @@ public class BranchIterator: IteratorProtocol {
         var type = type.raw
 
         while true {
+            // Task should not be cancelled
+            if Task.isCancelled { return nil }
+
             // Get the next branch
             let status = git_branch_next(&branchPointer, &type, branchIterator)
             defer { git_reference_free(branchPointer) }
