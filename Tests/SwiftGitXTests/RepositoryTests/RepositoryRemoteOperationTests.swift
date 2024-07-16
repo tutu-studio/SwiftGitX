@@ -24,8 +24,7 @@ final class RepositoryRemoteOperationTests: SwiftGitXTestCase {
 
     func testRepositoryPushEmptyRemote_SetUpstream() async throws {
         // Create a mock repository at the temporary directory
-        let remoteDirectory = Repository.mockDirectory(named: "test-push-empty--remote", in: Self.directory)
-        let remoteRepository = try Repository.create(at: remoteDirectory, isBare: true)
+        let remoteRepository = Repository.mock(named: "test-push-empty--remote", in: Self.directory, isBare: true)
 
         // Create a mock repository at the temporary directory
         let localRepository = Repository.mock(named: "test-push-empty--local", in: Self.directory)
@@ -34,7 +33,7 @@ final class RepositoryRemoteOperationTests: SwiftGitXTestCase {
         try localRepository.mockCommit(message: "Pushed commit", file: localRepository.mockFile(named: "PushedFile.md"))
 
         // Add remote repository to the local repository
-        try localRepository.remote.add(named: "origin", at: remoteDirectory)
+        try localRepository.remote.add(named: "origin", at: remoteRepository.path)
 
         // Push the commit to the remote repository
         try await localRepository.push()
