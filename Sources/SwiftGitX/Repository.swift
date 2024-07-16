@@ -89,6 +89,29 @@ public final class Repository {
     }
 }
 
+extension Repository: Codable, Equatable, Hashable {
+    public convenience init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let path = try container.decode(String.self)
+
+        try self.init(at: URL(fileURLWithPath: path), createIfNotExists: false)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(workingDirectory.path)
+    }
+
+    public static func == (lhs: Repository, rhs: Repository) -> Bool {
+        lhs.path == rhs.path
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        // ? should we hash pointer?
+        hasher.combine(path)
+    }
+}
+
 // MARK: - Repository properties
 
 public extension Repository {

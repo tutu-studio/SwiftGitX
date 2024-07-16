@@ -266,4 +266,58 @@ final class RepositoryTests: SwiftGitXTestCase {
         // Check if the destination repository exists
         XCTAssertFalse(FileManager.default.fileExists(atPath: directory.path))
     }
+
+    func testRepositoryCodable() throws {
+        // Create a repository at the temporary directory
+        let repository = Repository.mock(named: "test-codable", in: Self.directory)
+
+        // Create a new commit
+        try repository.mockCommit()
+
+        // Encode the repository
+        let data = try JSONEncoder().encode(repository)
+
+        // Decode the repository
+        let decodedRepository = try JSONDecoder().decode(Repository.self, from: data)
+
+        // Check if the decoded repository HEAD is the same as the original repository HEAD
+        // swiftlint:disable:next force_cast
+        try XCTAssertEqual(repository.HEAD as! Branch, decodedRepository.HEAD as! Branch)
+    }
+
+    func testRepositoryEquatable() throws {
+        // Create a repository at the temporary directory
+        let repository = Repository.mock(named: "test-equatable", in: Self.directory)
+
+        // Create a new commit
+        try repository.mockCommit()
+
+        // Create a new repository with the same directory
+        let anotherRepository = try Repository(at: repository.path)
+
+        // Check if the repository HEADs are the same
+        // swiftlint:disable:next force_cast
+        try XCTAssertEqual(repository.HEAD as! Branch, anotherRepository.HEAD as! Branch)
+
+        // Check if the repositories are equal
+        XCTAssertEqual(repository, anotherRepository)
+    }
+
+    func testRepositoryHashable() throws {
+        // Create a repository at the temporary directory
+        let repository = Repository.mock(named: "test-hashable", in: Self.directory)
+
+        // Create a new commit
+        try repository.mockCommit()
+
+        // Create a new repository with the same directory
+        let anotherRepository = try Repository(at: repository.path)
+
+        // Check if the repository HEADs are the same
+        // swiftlint:disable:next force_cast
+        try XCTAssertEqual(repository.HEAD as! Branch, anotherRepository.HEAD as! Branch)
+
+        // Check if the repositories have the same hash value
+        XCTAssertEqual(repository.hashValue, anotherRepository.hashValue)
+    }
 }
