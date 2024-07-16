@@ -5,7 +5,7 @@ import libgit2
 /// This sequence is an async sequence that iterates over the commits in a repository.
 ///
 /// - Warning: The sequence's task should be cancelled before ``Repository`` is deinitialized.
-public struct CommitSequence: AsyncSequence {
+public struct CommitSequence: Sequence {
     public typealias Element = Commit
 
     public let root: Commit
@@ -19,12 +19,12 @@ public struct CommitSequence: AsyncSequence {
         self.repositoryPointer = repositoryPointer
     }
 
-    public func makeAsyncIterator() -> CommitIterator {
+    public func makeIterator() -> CommitIterator {
         CommitIterator(root: root, sorting: sorting, repositoryPointer: repositoryPointer)
     }
 }
 
-public class CommitIterator: AsyncIteratorProtocol {
+public class CommitIterator: IteratorProtocol {
     public let root: Commit
     public let sorting: LogSortingOption
 

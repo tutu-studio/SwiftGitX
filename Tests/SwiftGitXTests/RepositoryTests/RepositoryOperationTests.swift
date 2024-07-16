@@ -210,11 +210,8 @@ final class RepositoryOperationTests: SwiftGitXTestCase {
         }
 
         // Get the log of the repository
-        var logCommits = [Commit]()
-
-        for await commit in try repository.log(from: repository.HEAD, sorting: .reverse) {
-            logCommits.append(commit)
-        }
+        let commitSequence = try repository.log(from: repository.HEAD, sorting: .reverse)
+        let logCommits = Array(commitSequence)
 
         // Check if the commits are the same
         XCTAssertEqual(logCommits, createdCommits)
