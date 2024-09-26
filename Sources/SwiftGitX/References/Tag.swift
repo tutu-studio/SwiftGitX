@@ -1,3 +1,4 @@
+import Foundation
 import libgit2
 
 public enum TagError: Error {
