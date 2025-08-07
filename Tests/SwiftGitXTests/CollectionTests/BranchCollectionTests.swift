@@ -219,7 +219,7 @@ final class BranchCollectionTests: SwiftGitXTestCase {
 
     func testBranchUpstream() async throws {
         // Create a mock repository at the temporary directory
-        let source = URL(string: "https://github.com/ibrahimcetin/ibrahimcetin.dev.git")!
+        let source = URL(string: "https://github.com/ibrahimcetin/SwiftGitX.git")!
         let directory = Repository.mockDirectory(named: "test-branch-upstream", in: Self.directory)
         let repository = try await Repository.clone(from: source, to: directory)
 
@@ -234,7 +234,7 @@ final class BranchCollectionTests: SwiftGitXTestCase {
 
     func testBranchSetUpstream() async throws {
         // Create a mock repository at the temporary directory
-        let source = URL(string: "https://github.com/ibrahimcetin/ibrahimcetin.dev.git")!
+        let source = URL(string: "https://github.com/ibrahimcetin/SwiftGitX.git")!
         let directory = Repository.mockDirectory(named: "test-branch-set-upstream", in: Self.directory)
         let repository = try await Repository.clone(from: source, to: directory)
 
@@ -254,7 +254,7 @@ final class BranchCollectionTests: SwiftGitXTestCase {
 
     func testBranchUnsetUpstream() async throws {
         // Create a mock repository at the temporary directory
-        let source = URL(string: "https://github.com/ibrahimcetin/ibrahimcetin.dev.git")!
+        let source = URL(string: "https://github.com/ibrahimcetin/SwiftGitX.git")!
         let directory = Repository.mockDirectory(named: "test-branch-unset-upstream", in: Self.directory)
         let repository = try await Repository.clone(from: source, to: directory)
 

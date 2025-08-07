@@ -4,7 +4,7 @@ import XCTest
 final class RepositoryRemoteOperationTests: SwiftGitXTestCase {
     func testRepositoryPush() async throws {
         // Create a mock repository at the temporary directory
-        let source = URL(string: "https://github.com/ibrahimcetin/ibrahimcetin.dev.git")!
+        let source = URL(string: "https://github.com/ibrahimcetin/SwiftGitX.git")!
         let remoteDirectory = Repository.mockDirectory(named: "test-push--remote", in: Self.directory)
         let remoteRepository = try await Repository.clone(from: source, to: remoteDirectory, options: .bare)
 

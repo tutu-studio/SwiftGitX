@@ -156,7 +156,7 @@ final class RepositoryTests: SwiftGitXTestCase {
 
     func testRepositoryClone() async throws {
         // Create a temporary URL for the source repository
-        let source = URL(string: "https://github.com/ibrahimcetin/ibrahimcetin.dev.git")!
+        let source = URL(string: "https://github.com/ibrahimcetin/SwiftGitX.git")!
 
         // Create a temporary directory for the destination repository
         let directory = Repository.mockDirectory(named: "test-clone", in: Self.directory)
@@ -173,7 +173,7 @@ final class RepositoryTests: SwiftGitXTestCase {
 
     func testRepositoryCloneCancellation() async {
         // Create a temporary URL for the source repository
-        let source = URL(string: "https://github.com/ibrahimcetin/ibrahimcetin.dev.git")!
+        let source = URL(string: "https://github.com/ibrahimcetin/SwiftGitX.git")!
 
         // Create a temporary directory for the destination repository
         let directory = Repository.mockDirectory(named: "test-clone-cancellation", in: Self.directory)
@@ -204,7 +204,7 @@ final class RepositoryTests: SwiftGitXTestCase {
 
     func testRepositoryCloneWithProgress() async throws {
         // Create source URL for the repository
-        let source = URL(string: "https://github.com/ibrahimcetin/ibrahimcetin.dev.git")!
+        let source = URL(string: "https://github.com/ibrahimcetin/SwiftGitX.git")!
 
         // Create a temporary directory for the destination repository
         let directory = Repository.mockDirectory(named: "test-clone-progress", in: Self.directory)
@@ -234,7 +234,7 @@ final class RepositoryTests: SwiftGitXTestCase {
 
     func testRepositoryCloneWithProgressCancellation() async throws {
         // Create source URL for the repository
-        let source = URL(string: "https://github.com/ibrahimcetin/ibrahimcetin.dev.git")!
+        let source = URL(string: "https://github.com/ibrahimcetin/SwiftGitX.git")!
 
         // Create a temporary directory for the destination repository
         let directory = Repository.mockDirectory(named: "test-clone-progress-cancellation", in: Self.directory)
