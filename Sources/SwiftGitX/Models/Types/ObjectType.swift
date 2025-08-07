@@ -7,8 +7,6 @@ public enum ObjectType: LibGit2RawRepresentable {
     case tree
     case blob
     case tag
-    case offsetDelta
-    case referenceDelta
 
     init(raw: git_object_t) {
         self = Self.objectTypeMapping.first(where: { $0.value == raw })?.key ?? .invalid
@@ -26,8 +24,6 @@ private extension ObjectType {
         .commit: GIT_OBJECT_COMMIT,
         .tree: GIT_OBJECT_TREE,
         .blob: GIT_OBJECT_BLOB,
-        .tag: GIT_OBJECT_TAG,
-        .offsetDelta: GIT_OBJECT_OFS_DELTA,
-        .referenceDelta: GIT_OBJECT_REF_DELTA
+        .tag: GIT_OBJECT_TAG
     ]
 }
