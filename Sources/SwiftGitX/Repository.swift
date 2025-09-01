@@ -35,7 +35,7 @@ public enum RepositoryError: Error {
 
     case failedToPush(String)
     case failedToFetch(String)
-    // case failedToPull(String)
+    case failedToPull(String)
 }
 
 // MARK: - Repository
@@ -1397,5 +1397,112 @@ public extension Repository {
         }
     }
 
-    // TODO: Implement pull
+    /// Pull changes from the given remote into the current branch.
+    ///
+    /// - Parameters:
+    ///   - remote: The remote to pull from. Defaults to the current branch's upstream remote or `origin`.
+    ///   - options: Pull behavior. Default is fast-forward only.
+    ///
+    /// Fast-forward is attempted by default. If not possible, an error is thrown (like `git pull --ff-only`).
+    func pull(remote: Remote? = nil, options: PullOptions = .default) async throws {
+        try await withUnsafeThrowingContinuation { continuation in
+            do {
+                try pull(remote: remote, options: options)
+                continuation.resume()
+            } catch {
+                continuation.resume(throwing: error)
+            }
+        }
+    }
+
+    private func pull(remote: Remote? = nil, options: PullOptions) throws {
+        // 1) Determine remote
+        let chosenRemote = try resolveRemote(explicit: remote)
+
+        // 2) Fetch updates
+        try fetch(remote: chosenRemote)
+
+        // 3) Determine local current branch and its upstream tracking branch
+        let currentBranch = try branch.current
+
+        // Resolve upstream: prefer configured upstream branch; otherwise use <remote>/<branch.name>
+        let upstreamBranch: Branch = try resolveUpstreamBranch(for: currentBranch, on: chosenRemote)
+
+        guard let upstreamCommit = upstreamBranch.target as? Commit,
+              let localCommit = currentBranch.target as? Commit
+        else {
+            throw RepositoryError.failedToPull("Unable to resolve commits for pull")
+        }
+
+        // If already up to date, nothing to do
+        if upstreamCommit.id == localCommit.id { return }
+
+        switch options.strategy {
+        case .fastForward:
+            // Check if fast-forward is possible: local is ancestor of upstream
+            var upstreamOID = upstreamCommit.id.raw
+            var localOID = localCommit.id.raw
+            let isFF = git_graph_descendant_of(pointer, &upstreamOID, &localOID) == 1
+
+            guard isFF else {
+                throw RepositoryError.failedToPull("Non fast-forward; use merge or rebase")
+            }
+
+            // Perform safe checkout to upstream commit (updates working tree)
+            try checkout(commitID: upstreamCommit.id)
+
+            // Move local branch ref to upstream commit (advance ref tip)
+            try advance(branch: currentBranch, to: upstreamCommit.id)
+
+        case .merge:
+            // Placeholder for merge-based pull
+            throw RepositoryError.failedToPull("Merge strategy not implemented yet")
+
+        case .rebase:
+            // Placeholder for rebase-based pull
+            throw RepositoryError.failedToPull("Rebase strategy not implemented yet")
+        }
+    }
+
+    // Resolve which remote to use for pull
+    private func resolveRemote(explicit: Remote?) throws -> Remote {
+        if let explicit { return explicit }
+        if let upstreamRemote = try? branch.current.remote { return upstreamRemote }
+        if let origin = remote["origin"] { return origin }
+        throw RepositoryError.failedToPull("No remote configured for current branch")
+    }
+
+    // Resolve the upstream branch to pull from
+    private func resolveUpstreamBranch(for localBranch: Branch, on remote: Remote) throws -> Branch {
+        if let upstream = localBranch.upstream as? Branch { return upstream }
+        // Fall back to <remote>/<localBranch.name>
+        let remoteQualified = "\(remote.name)/\(localBranch.name)"
+        return try branch.get(named: remoteQualified, type: .remote)
+    }
+
+    // Advance a local branch ref to the specified commit OID
+    private func advance(branch: Branch, to oid: OID) throws {
+        // Only local branches can be moved
+        guard branch.type == .local else {
+            throw RepositoryError.failedToPull("Cannot advance a non-local branch: \(branch.name)")
+        }
+
+        let branchPointer = try ReferenceFactory.lookupBranchPointer(
+            name: branch.name,
+            type: GIT_BRANCH_LOCAL,
+            repositoryPointer: pointer
+        )
+        defer { git_reference_free(branchPointer) }
+
+        var newOID = oid.raw
+        var newRef: OpaquePointer?
+        defer { git_reference_free(newRef) }
+
+        let status = git_reference_set_target(&newRef, branchPointer, &newOID, "Fast-forward")
+
+        guard status == GIT_OK.rawValue else {
+            let errorMessage = String(cString: git_error_last().pointee.message)
+            throw RepositoryError.failedToPull(errorMessage)
+        }
+    }
 }
